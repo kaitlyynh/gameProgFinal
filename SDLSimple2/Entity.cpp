@@ -20,12 +20,11 @@ void Entity::ai_activate(Entity *player)
         case WALKER:
             ai_walk();
             break;
+            
         case GUARD:
             ai_guard(player);
             break;
-        case JUMPER:
-            ai_jump();
-            break;
+            
         default:
             break;
     }
@@ -58,11 +57,7 @@ void Entity::ai_guard(Entity *player)
             break;
     }
 }
-void Entity::ai_jump() {
-    if (get_collided_bottom()) {
-        jump();
-    }
-}
+
 // Default constructor
 Entity::Entity()
     : m_position(0.0f), m_movement(0.0f), m_scale(1.0f, 1.0f, 0.0f), m_model_matrix(1.0f),
@@ -101,8 +96,6 @@ Entity::Entity(GLuint texture_id, float speed,  float width, float height, Entit
     for (int i = 0; i < SECONDS_PER_FRAME; ++i)
         for (int j = 0; j < SECONDS_PER_FRAME; ++j) m_walking[i][j] = 0;
 }
-
-
 Entity::Entity(GLuint texture_id, float speed, float width, float height, EntityType EntityType, AIType AIType, AIState AIState): m_position(0.0f), m_movement(0.0f), m_scale(1.0f, 1.0f, 0.0f), m_model_matrix(1.0f),
 m_speed(speed), m_animation_cols(0), m_animation_frames(0), m_animation_index(0),
 m_animation_rows(0), m_animation_indices(nullptr), m_animation_time(0.0f),
@@ -220,7 +213,6 @@ void const Entity::check_collision_x(Entity *collidable_entities, int collidable
     }
 }
 
-
 void const Entity::check_collision_y(Map *map)
 {
     // Probes for tiles above
@@ -300,8 +292,6 @@ void const Entity::check_collision_x(Map *map)
         m_collided_right = true;
     }
 }
-
-
 void Entity::update(float delta_time, Entity *player, Entity *collidable_entities, int collidable_entity_count, Map *map)
 {
     if (!m_is_active) return;
@@ -336,7 +326,14 @@ void Entity::update(float delta_time, Entity *player, Entity *collidable_entitie
     m_velocity.x = m_movement.x * m_speed;
     m_velocity += m_acceleration * delta_time;
     
+    if (m_is_jumping)
+    {
+        m_is_jumping = false;
+        m_velocity.y += m_jumping_power;
+    }
+    
     m_position.y += m_velocity.y * delta_time;
+    
     check_collision_y(collidable_entities, collidable_entity_count);
     check_collision_y(map);
     
@@ -344,15 +341,9 @@ void Entity::update(float delta_time, Entity *player, Entity *collidable_entitie
     check_collision_x(collidable_entities, collidable_entity_count);
     check_collision_x(map);
     
-    if (m_is_jumping)
-    {
-        m_is_jumping = false;
-        m_velocity.y += m_jumping_power;
-    }
-    
     m_model_matrix = glm::mat4(1.0f);
     m_model_matrix = glm::translate(m_model_matrix, m_position);
-    m_model_matrix = glm::scale(m_model_matrix, m_sprite_size);
+//    m_model_matrix = glm::scale(m_model_matrix, m_sprite_size);
 }
 
 

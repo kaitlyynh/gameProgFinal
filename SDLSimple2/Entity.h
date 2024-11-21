@@ -5,7 +5,7 @@
 #include "glm/glm.hpp"
 #include "ShaderProgram.h"
 enum EntityType { PLATFORM, PLAYER, ENEMY  };
-enum AIType     { WALKER, GUARD, JUMPER};
+enum AIType     { WALKER, GUARD            };
 enum AIState    { WALKING, IDLE, ATTACKING };
 
 
@@ -14,11 +14,7 @@ enum AnimationDirection { LEFT, RIGHT, UP, DOWN };
 class Entity
 {
 private:
-    // Change sprite size
     glm::vec3 m_sprite_size;
-    // Walker direction flag
-    bool m_walk_left = true; // For Walker AI only
-    
     bool m_is_active = true;
     
     int m_walking[4][4]; // 4x4 array for walking animations
@@ -63,10 +59,6 @@ private:
     Entity* m_collided_with = nullptr;
 
 public:
-    // Set sprite size
-    void set_sprite_size(glm::vec3 dimensions) {
-        m_sprite_size = dimensions;
-    }
     // ————— STATIC VARIABLES ————— //
     static constexpr int SECONDS_PER_FRAME = 4;
 
@@ -95,7 +87,6 @@ public:
     void ai_activate(Entity *player);
     void ai_walk();
     void ai_guard(Entity *player);
-    void ai_jump();
     
     void normalise_movement() { m_movement = glm::normalize(m_movement); }
 
@@ -104,10 +95,10 @@ public:
     void face_up() { m_animation_indices = m_walking[UP]; }
     void face_down() { m_animation_indices = m_walking[DOWN]; }
 
-    void move_left() { m_movement.x = -1.0f;  } // face_left()
-    void move_right() { m_movement.x = 1.0f;   }
-    void move_up() { m_movement.y = 1.0f;   }
-    void move_down() { m_movement.y = -1.0f;  }
+    void move_left() { m_movement.x = -1.0f; ; }
+    void move_right() { m_movement.x = 1.0f;  ; }
+    void move_up() { m_movement.y = 1.0f;  ; }
+    void move_down() { m_movement.y = -1.0f; ; }
     
     void const jump() { m_is_jumping = true; }
 
@@ -115,6 +106,7 @@ public:
     EntityType const get_entity_type()    const { return m_entity_type;   };
     AIType     const get_ai_type()        const { return m_ai_type;       };
     AIState    const get_ai_state()       const { return m_ai_state;      };
+    float const get_jumping_power() const { return m_jumping_power; }
     glm::vec3 const get_position()     const { return m_position; }
     glm::vec3 const get_velocity()     const { return m_velocity; }
     glm::vec3 const get_acceleration() const { return m_acceleration; }
@@ -126,8 +118,8 @@ public:
     bool      const get_collided_bottom() const { return m_collided_bottom; }
     bool      const get_collided_right() const { return m_collided_right; }
     bool      const get_collided_left() const { return m_collided_left; }
-    Entity* const get_collided_with() const { return m_collided_with; }
-    bool get_is_active() const { return m_is_active; }
+    bool get_is_active() { return m_is_active; }
+    Entity* get_collided_with() { return m_collided_with; }
     void activate()   { m_is_active = true;  };
     void deactivate() { m_is_active = false; };
     // ————— SETTERS ————— //
@@ -146,9 +138,13 @@ public:
     void const set_animation_frames(int new_frames) { m_animation_frames = new_frames; }
     void const set_animation_index(int new_index) { m_animation_index = new_index; }
     void const set_animation_time(float new_time) { m_animation_time = new_time; }
+    void const set_animation_indices(int* ptr) { m_animation_indices = ptr; }
     void const set_jumping_power(float new_jumping_power) { m_jumping_power = new_jumping_power;}
     void const set_width(float new_width) {m_width = new_width; }
     void const set_height(float new_height) {m_height = new_height; }
+    void set_sprite_size(glm::vec3 dimensions) {
+            m_sprite_size = dimensions;
+        }
 
     // Setter for m_walking
     void set_walking(int walking[4][4])
