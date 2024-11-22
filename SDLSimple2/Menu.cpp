@@ -42,7 +42,7 @@ void Menu::initialise()
     m_game_state.player->set_position(glm::vec3(0.0f, 2.0f, 0.0f));
     m_game_state.player->set_acceleration(acceleration);
     m_game_state.player->set_jumping_power(3.0f);
-    m_game_state.player->set_animation_indices(nullptr);
+//    m_game_state.player->set_animation_indices(nullptr);
     
 //    m_game_state.player = new Entity(
 //        player_texture_id,         // texture id

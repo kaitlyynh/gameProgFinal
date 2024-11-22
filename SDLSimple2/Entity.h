@@ -145,7 +145,7 @@ public:
     void set_sprite_size(glm::vec3 dimensions) {
             m_sprite_size = dimensions;
         }
-
+    void uncollide() { m_collided_with = nullptr; }
     // Setter for m_walking
     void set_walking(int walking[4][4])
     {

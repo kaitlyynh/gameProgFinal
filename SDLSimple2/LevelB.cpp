@@ -55,7 +55,7 @@ void LevelB::initialise()
     {
         LOG("Spawn enemy");
         LOG(i);
-        m_game_state.enemies[i] =  Entity(enemy_texture_id, 0.45f, 0.45f, 1.1f, ENEMY, GUARD, IDLE);
+        m_game_state.enemies[i] =  Entity(enemy_texture_id, 0.5, 0.5, 1.1f, ENEMY, GUARD, IDLE);
         m_game_state.enemies[i].set_position(glm::vec3((i * 0.5f) + 1.0f, 2.0f, 0.0f));
         m_game_state.enemies[i].set_movement(glm::vec3(0.0f));
         m_game_state.enemies[i].set_acceleration(glm::vec3(0.0f, -9.81f, 0.0f));
@@ -99,6 +99,7 @@ void LevelB::update(float delta_time)
         m_game_state.player->check_collision_y(m_game_state.enemies, ENEMY_COUNT);
         if ((m_game_state.player->get_collided_left() || m_game_state.player->get_collided_right()) && m_game_state.player->get_collided_with() == &m_game_state.enemies[i]) {
                 LOG("Enemy side hit B");
+            m_game_state.player->uncollide();
             damage_taken += 1;
         } else if (m_game_state.player->get_collided_bottom() && m_game_state.player->get_collided_with() == &m_game_state.enemies[i] &&
                    !m_game_state.enemies[i].get_collided_left() && !m_game_state.enemies[i].get_collided_right()) {
@@ -106,11 +107,12 @@ void LevelB::update(float delta_time)
             if (m_game_state.enemies[i].get_is_active()) {
                 m_game_state.enemies[i].deactivate();
                 enemies_killed++;
+                m_game_state.player->uncollide();
 
             }
-            
-            
+
         }
+        
         
         
     }

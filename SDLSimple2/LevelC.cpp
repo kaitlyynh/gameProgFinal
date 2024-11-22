@@ -99,6 +99,7 @@ void LevelC::update(float delta_time)
         m_game_state.player->check_collision_y(m_game_state.enemies, ENEMY_COUNT);
         if ((m_game_state.player->get_collided_left() || m_game_state.player->get_collided_right()) && m_game_state.player->get_collided_with() == &m_game_state.enemies[i]) {
                 LOG("Enemy side hit C");
+            m_game_state.player->uncollide();
             damage_taken += 1;
         } else if (m_game_state.player->get_collided_bottom() && m_game_state.player->get_collided_with() == &m_game_state.enemies[i] &&
                    !m_game_state.enemies[i].get_collided_left() && !m_game_state.enemies[i].get_collided_right()) {
@@ -106,10 +107,9 @@ void LevelC::update(float delta_time)
             if (m_game_state.enemies[i].get_is_active()) {
                 m_game_state.enemies[i].deactivate();
                 enemies_killed++;
-
+                m_game_state.player->uncollide();
             }
-            
-            
+
         }
         
         

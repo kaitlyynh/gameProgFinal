@@ -41,7 +41,7 @@ void LevelA::initialise()
 //    m_game_state.player->set_sprite_size(glm::vec3(1.0f, 2.0f, 0.0f)); // change size of sprite
     m_game_state.player->set_position(glm::vec3(3.0f, 2.0f, 0.0f));
     m_game_state.player->set_acceleration(acceleration);
-    m_game_state.player->set_jumping_power(4.0f);
+    m_game_state.player->set_jumping_power(5.0f);
     m_game_state.player->set_animation_indices(nullptr);
     
     
@@ -96,12 +96,14 @@ void LevelA::update(float delta_time)
         if ((m_game_state.player->get_collided_left() || m_game_state.player->get_collided_right()) && m_game_state.player->get_collided_with() == &m_game_state.enemies[i]) {
                 LOG("Enemy side hit");
             damage_taken += 1;
+            m_game_state.player->uncollide();
         } else if (m_game_state.player->get_collided_bottom() && m_game_state.player->get_collided_with() == &m_game_state.enemies[i] &&
                    !m_game_state.enemies[i].get_collided_left() && !m_game_state.enemies[i].get_collided_right()) {
             LOG("Enemy head hit");
             if (m_game_state.enemies[i].get_is_active()) {
                 m_game_state.enemies[i].deactivate();
                 enemies_killed++;
+                m_game_state.player->uncollide();
             }
         }
         
