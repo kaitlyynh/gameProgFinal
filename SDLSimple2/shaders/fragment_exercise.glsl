@@ -1,22 +1,20 @@
-uniform float LINEAR_ATTENUATION_FACTOR;
-uniform float QUADRATIC_ATTENUATION_FACTOR;
-
+// fragment_lit.glsl
 uniform sampler2D diffuse;
-uniform vec2 light_position;
+uniform vec2 lightPosition;
 
-varying vec2 tex_coord_var;
-varying vec2 pix_position;
+varying vec2 texCoordVar;
+varying vec2 varPosition;
 
-float attenuate(float dist, float lin_att, float quad_att)
+float attenuate(float dist, float a, float b)
 {
-     return 1.0 / (1.0 + (lin_att * dist) + (quad_att * dist  * dist));
+     return 1.0 / (1.0 + (a * dist) + (b * dist  * dist));
 }
 
 void main()
 {
-    float brightness = attenuate(distance(light_position, pix_position),
-                                 LINEAR_ATTENUATION_FACTOR, QUADRATIC_ATTENUATION_FACTOR);
-    
-    vec4 color = texture2D(diffuse, tex_coord_var);
+    // The brightness is directly based on the distance between the light source's
+    // location and the pixel's location
+    float brightness = attenuate(distance(lightPosition, varPosition), 1.0, 0.0);
+    vec4 color = texture2D(diffuse, texCoordVar);
     gl_FragColor = vec4(color.rgb * brightness, color.a);
 }

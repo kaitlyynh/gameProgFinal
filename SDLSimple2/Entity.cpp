@@ -12,6 +12,20 @@
 #include "glm/gtc/matrix_transform.hpp"
 #include "ShaderProgram.h"
 #include "Entity.h"
+#include "Scene.h"
+
+
+void Entity::shoot_bullet(Scene* curr_scene, glm::vec3 shoot_direction) {
+    Entity* player_cursor = curr_scene->get_state().player;
+    if (player_cursor->get_bullet_curr() <= 0) { return; } // No more bullets to shoot
+    Entity* bullet_cursor = &curr_scene->get_state().bullets[player_cursor->get_bullet_curr()];
+    bullet_cursor->set_position(player_cursor->get_position());
+    bullet_cursor->set_render_bullet(true);
+    bullet_cursor->set_movement(shoot_direction);
+    player_cursor->set_bullet_curr(player_cursor->get_bullet_curr() - 1);
+    
+//    std::cout << "bullet " << player_cursor->get_bullet_curr() << " shoot_bullet() at " << player_cursor->get_position().x << " " << player_cursor->get_position().y << " direction: " << player_cursor->get_velocity().x << " " << player_cursor->get_velocity().y << " " << bullet_cursor->get_render_bullet() << std::endl;
+}
 
 void Entity::ai_activate(Entity *player)
 {
@@ -25,18 +39,35 @@ void Entity::ai_activate(Entity *player)
             ai_guard(player);
             break;
             
+        case WALKER_V:
+            ai_walk_v();
         default:
             break;
     }
 }
-
+void Entity::ai_walk_v() {
+    if (get_walk_up()) {
+        m_movement = glm::vec3(0.0f, 1.0f, 0.0f);
+    } else {
+        m_movement = glm::vec3(0.0f, -1.0f, 0.0f);
+    }
+}
 void Entity::ai_walk()
 {
-    m_movement = glm::vec3(-1.0f, 0.0f, 0.0f);
+    if (get_walk_left()) {
+        m_movement = glm::vec3(-1.0f, 0.0f, 0.0f);
+    } else {
+        m_movement = glm::vec3(1.0f, 0.0f, 0.0f);
+    }
+    
 }
 
 void Entity::ai_guard(Entity *player)
 {
+    // Directives used for WALKING state
+    float x_dir = 0.0f;
+    float y_dir = 0.0f;
+    
     switch (m_ai_state) {
         case IDLE:
             if (glm::distance(m_position, player->get_position()) < 3.0f) m_ai_state = WALKING;
@@ -45,9 +76,27 @@ void Entity::ai_guard(Entity *player)
         case WALKING:
             if (m_position.x > player->get_position().x) {
                 m_movement = glm::vec3(-1.0f, 0.0f, 0.0f);
+                x_dir = -1.0f;
+//                face_left();
+//                move_left();
             } else {
                 m_movement = glm::vec3(1.0f, 0.0f, 0.0f);
+                x_dir = 1.0f;
+//                face_right();
+//                move_right();
             }
+            if (m_position.y > player->get_position().y) {
+                m_movement = glm::vec3(0.0f, 1.0f, 0.0f);
+                y_dir = -1.0f;
+//                face_down();
+//                move_down();
+            } else {
+                m_movement = glm::vec3(0.0f, -1.0f, 0.0f);
+                y_dir = 1.0f;
+//                face_up();
+//                move_up();
+            }
+            m_movement = glm::vec3(x_dir, y_dir, 0.0f);
             break;
             
         case ATTACKING:
@@ -234,18 +283,21 @@ void const Entity::check_collision_y(Map *map)
         m_position.y -= penetration_y;
         m_velocity.y = 0;
         m_collided_top = true;
+        m_collided_with_map = true;
     }
     else if (map->is_solid(top_left, &penetration_x, &penetration_y) && m_velocity.y > 0)
     {
         m_position.y -= penetration_y;
         m_velocity.y = 0;
         m_collided_top = true;
+        m_collided_with_map = true;
     }
     else if (map->is_solid(top_right, &penetration_x, &penetration_y) && m_velocity.y > 0)
     {
         m_position.y -= penetration_y;
         m_velocity.y = 0;
         m_collided_top = true;
+        m_collided_with_map = true;
     }
     
     // And the bottom three points
@@ -254,18 +306,21 @@ void const Entity::check_collision_y(Map *map)
         m_position.y += penetration_y;
         m_velocity.y = 0;
         m_collided_bottom = true;
+        m_collided_with_map = true;
     }
     else if (map->is_solid(bottom_left, &penetration_x, &penetration_y) && m_velocity.y < 0)
     {
             m_position.y += penetration_y;
             m_velocity.y = 0;
             m_collided_bottom = true;
+            m_collided_with_map = true;
     }
     else if (map->is_solid(bottom_right, &penetration_x, &penetration_y) && m_velocity.y < 0)
     {
         m_position.y += penetration_y;
         m_velocity.y = 0;
         m_collided_bottom = true;
+        m_collided_with_map = true;
         
     }
 }
@@ -295,7 +350,6 @@ void const Entity::check_collision_x(Map *map)
 void Entity::update(float delta_time, Entity *player, Entity *collidable_entities, int collidable_entity_count, Map *map)
 {
     if (!m_is_active) return;
- 
     m_collided_top    = false;
     m_collided_bottom = false;
     m_collided_left   = false;
@@ -326,6 +380,9 @@ void Entity::update(float delta_time, Entity *player, Entity *collidable_entitie
     m_velocity.x = m_movement.x * m_speed;
     m_velocity += m_acceleration * delta_time;
     
+    // Support up & down movement
+    m_velocity.y = m_movement.y * m_speed;
+    
     if (m_is_jumping)
     {
         m_is_jumping = false;
@@ -333,7 +390,6 @@ void Entity::update(float delta_time, Entity *player, Entity *collidable_entitie
     }
     
     m_position.y += m_velocity.y * delta_time;
-    
     check_collision_y(collidable_entities, collidable_entity_count);
     check_collision_y(map);
     
@@ -343,7 +399,9 @@ void Entity::update(float delta_time, Entity *player, Entity *collidable_entitie
     
     m_model_matrix = glm::mat4(1.0f);
     m_model_matrix = glm::translate(m_model_matrix, m_position);
-//    m_model_matrix = glm::scale(m_model_matrix, m_sprite_size);
+    
+    // Adjust sprite size
+    m_model_matrix = glm::scale(m_model_matrix, m_sprite_size);
 }
 
 
@@ -356,7 +414,6 @@ void Entity::render(ShaderProgram* program)
         draw_sprite_from_texture_atlas(program, m_texture_id, m_animation_indices[m_animation_index]);
         return;
     }
-
     float vertices[] = { -0.5, -0.5, 0.5, -0.5, 0.5, 0.5, -0.5, -0.5, 0.5, 0.5, -0.5, 0.5 };
     float tex_coords[] = { 0.0,  1.0, 1.0,  1.0, 1.0, 0.0,  0.0,  1.0, 1.0, 0.0,  0.0, 0.0 };
 

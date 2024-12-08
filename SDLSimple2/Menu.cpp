@@ -8,14 +8,6 @@ constexpr char SPRITESHEET_FILEPATH[] = "assets/mario4.png",
            ENEMY_FILEPATH[]       = "assets/thwomp.png",
             FONT_FILEPATH[] = "assets/font1.png";
 
-//unsigned int LEVEL_DATA[] =
-//{
-//    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-//    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-//    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-//    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-//    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-//};
 
 Menu::~Menu()
 {
@@ -28,11 +20,8 @@ Menu::~Menu()
 
 void Menu::initialise()
 {
-    
-//    GLuint map_texture_id = Utility::load_texture("assets/tileset.png");
-    
+    m_game_state.next_scene_id = 1;
     m_game_state.map = nullptr;
-    
     GLuint player_texture_id = Utility::load_texture(SPRITESHEET_FILEPATH);
 
     glm::vec3 acceleration = glm::vec3(0.0f, -4.81f, 0.0f);
@@ -105,8 +94,10 @@ void Menu::render(ShaderProgram *g_shader_program)
 //    m_game_state.player->render(g_shader_program);
 //    for (int i = 0; i < m_number_of_enemies; i++)
 //            m_game_state.enemies[i].render(g_shader_program);
-    glClearColor(1.0f, 1.0f, 0.0f, 1.0f);
+    glClearColor(1.0f, 1.0f, 0.6f, 1.0f); // Pastel yellow
     GLuint file_texture_id = Utility::load_texture(FONT_FILEPATH);
-    Utility::draw_text(g_shader_program, file_texture_id, "YELLOH", 1.0f, 0.125f, glm::vec3(-3.0f, 3.0f, 0.0f));
+    Utility::draw_text(g_shader_program, file_texture_id, "Animal", 0.600f, 0.03f, glm::vec3(-1.5f, 5.0f, 0.0f));
+    Utility::draw_text(g_shader_program, file_texture_id, "Collector", 0.600f, 0.03f, glm::vec3(-2.5f, 4.0f, 0.0f));
+    Utility::draw_text(g_shader_program, file_texture_id, "Enter to start", 0.600f, 0.03f, glm::vec3(-4.0f, 2.0f, 0.0f));
 
 }

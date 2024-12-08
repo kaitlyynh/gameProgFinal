@@ -15,8 +15,7 @@ GLuint Utility::load_texture(const char* filepath) {
     
     if (image == NULL)
     {
-        LOG(filepath);
-        LOG("Unable to load image. Make sure the path is correct.");
+        std::cout << "Unable to load image. Make sure the path is correct! Filepath: " << filepath << std::endl;
         assert(false);
     }
     

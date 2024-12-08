@@ -26,6 +26,7 @@ struct GameState
     Entity *player;
     Entity *enemies;
     Entity *platforms;
+    Entity *bullets;
     
     // ————— AUDIO ————— //
     Mix_Music *bgm;
@@ -41,6 +42,7 @@ protected:
     
 public:
     bool complete = false;
+    bool lose = false;
     // ————— ATTRIBUTES ————— //
     int m_number_of_enemies = 1;
     int damage_taken = 0; // 1 collision = 1 unit of damage taken out of 3 lives
