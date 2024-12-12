@@ -1,4 +1,12 @@
-
+/**
+* Author: Kaitlyn Huynh
+* Assignment: Animal Collector
+* Date due: Dec-11-2024, 2:00pm
+* I pledge that I have completed this assignment without
+* collaborating with anyone else, in conformance with the
+* NYU School of Engineering Policies and Procedures on
+* Academic Misconduct.
+**/
 #define GL_SILENCE_DEPRECATION
 #define GL_GLEXT_PROTOTYPES 1
 #define FIXED_TIMESTEP 0.0166666f
@@ -196,31 +204,39 @@ void process_input()
                     case SDLK_w:
                         if (g_current_scene == g_level_a || g_current_scene == g_level_b) {
                             g_current_scene->get_state().player->shoot_bullet(g_current_scene, glm::vec3(0.0f, 1.0f, 0.0f)); // Only shoot up
+                            if (g_current_scene->get_state().player->get_bullet_curr() > 0) {
+                                Mix_Chunk *shoot_sfx = Mix_LoadWAV("assets/attack_hit.mp3");
+                                Mix_PlayChannel(-1,  shoot_sfx, 0);
+                            }
                             break;
-                            Mix_Chunk *shoot_sfx = Mix_LoadWAV("assets/attack_hit.mp3");
-                            Mix_PlayChannel(-1,  shoot_sfx, 0);
                         }
                         
                         
                     case SDLK_a:
                         if (g_current_scene == g_level_a || g_current_scene == g_level_b) {
                             g_current_scene->get_state().player->shoot_bullet(g_current_scene, glm::vec3(-1.0f, 0.0f, 0.0f)); // Only shoot left
-                            Mix_Chunk *shoot_sfx = Mix_LoadWAV("assets/attack_hit.mp3");
-                            Mix_PlayChannel(-1,  shoot_sfx, 0);
+                            if (g_current_scene->get_state().player->get_bullet_curr() > 0) {
+                                Mix_Chunk *shoot_sfx = Mix_LoadWAV("assets/attack_hit.mp3");
+                                Mix_PlayChannel(-1,  shoot_sfx, 0);
+                            }
                             break;
                         }
                     case SDLK_d:
                         if (g_current_scene == g_level_a || g_current_scene == g_level_b) {
                             g_current_scene->get_state().player->shoot_bullet(g_current_scene, glm::vec3(1.0f, 0.0f, 0.0f)); // Only shoot right
-                            Mix_Chunk *shoot_sfx = Mix_LoadWAV("assets/attack_hit.mp3");
-                            Mix_PlayChannel(-1,  shoot_sfx, 0);
+                            if (g_current_scene->get_state().player->get_bullet_curr() > 0) {
+                                Mix_Chunk *shoot_sfx = Mix_LoadWAV("assets/attack_hit.mp3");
+                                Mix_PlayChannel(-1,  shoot_sfx, 0);
+                            }
                             break;
                         }
                     case SDLK_s:
                         if (g_current_scene == g_level_a || g_current_scene == g_level_b) {
                             g_current_scene->get_state().player->shoot_bullet(g_current_scene, glm::vec3(0.0f, -1.0f, 0.0f)); // Only shoot down
-                            Mix_Chunk *shoot_sfx = Mix_LoadWAV("assets/attack_hit.mp3");
-                            Mix_PlayChannel(-1,  shoot_sfx, 0);
+                            if (g_current_scene->get_state().player->get_bullet_curr() > 0) {
+                                Mix_Chunk *shoot_sfx = Mix_LoadWAV("assets/attack_hit.mp3");
+                                Mix_PlayChannel(-1,  shoot_sfx, 0);
+                            }
                             break;
                         }
                     case SDLK_1:

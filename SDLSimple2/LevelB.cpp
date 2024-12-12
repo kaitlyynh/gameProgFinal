@@ -16,7 +16,7 @@ constexpr char SPRITESHEET_FILEPATH[] = "assets/Hero.png",
             FIRE_BULLET_FILEPATH[] = "assets/fire.png",
             WATER_BULLET_FILEPATH[] = "assets/water.png",
             ROCK_BULLET_FILEPATH[] = "assets/rocks.png",
-            SKULL_BULLET_FILEPATH[] = "assets/skull.png",
+            SKULL_BULLET_FILEPATH[] = "assets/fruit_banana.png", // Changed a skull into a banana
             FONT_FILEPATH[] = "assets/font1.png",
             STAR_FILEPATH[] = "assets/star.png",
             SPIKES_FILEPATH[] = "assets/red_spikes.png",
@@ -91,7 +91,7 @@ void LevelB::initialise()
     
     m_game_state.player = new Entity(
         player_texture_id,         // texture id
-        1.25f,                      // speed
+        4.5f,                      // speed
         acceleration,              // acceleration
         0.0,                      // jumping power
         player_walking_animation,  // animation index sets
@@ -263,7 +263,7 @@ void LevelB::update(float delta_time)
     // Door platform [16]
     m_game_state.platforms[16].update(delta_time, m_game_state.player, m_game_state.bullets, m_game_state.player->get_bullet_cap(), m_game_state.map);
     if (m_game_state.player->check_collision(&m_game_state.platforms[16])) { // Insta kill if contact with door
-        std::cout << "Collided with door, insta kill" << std::endl;
+//        std::cout << "Collided with door, insta kill" << std::endl;
         m_game_state.player->set_curr_health(0);
     }
     // Star trophy
@@ -277,10 +277,11 @@ void LevelB::update(float delta_time)
         }
         if (all_enemies_dead) { // Star is touched + Enemies are killed
             complete = true;
-            std::cout << "Level B complete" << std::endl;
+//            std::cout << "Level B complete" << std::endl;
         }
     }
     float new_health_calculation;
+    
     // Update enemy movements
     for (int i = 0; i < ENEMY_COUNT; i++) {
         m_game_state.enemies[i].update(delta_time, m_game_state.player, m_game_state.player, 1, m_game_state.map);
@@ -305,7 +306,7 @@ void LevelB::update(float delta_time)
         // Check if enemy has been hit by a bullet
         for (int j = 0; j < m_game_state.player->get_bullet_cap(); j++) {
             if (m_game_state.enemies[i].check_collision(&m_game_state.bullets[j])) {
-                std::cout << "Enemy " << i << " collided with bullet " << j << std::endl;
+//                std::cout << "Enemy " << i << " collided with bullet " << j << std::endl;
                 m_game_state.bullets[i].set_render_bullet(false);
                 m_game_state.bullets[i].uncollide_with_entity();
                 m_game_state.bullets[i].uncollide_with_map();
@@ -327,7 +328,7 @@ void LevelB::update(float delta_time)
         // Fire bullet collided with the door & it hasn't been deleted already!
         if (m_game_state.bullets[i].get_collided_with() == (&m_game_state.platforms[16]) && m_game_state.bullets[i].get_bullet_filepath_string() == FIRE_BULLET_FILEPATH &&
             m_game_state.platforms[16].get_render()) {
-            std::cout << "Bullet " << i << " collided with the door " << std::endl;
+//            std::cout << "Bullet " << i << " collided with the door " << std::endl;
             m_game_state.platforms[16].set_render(false); // Delete the door
             m_game_state.platforms[16].uncollide_with_map();
             m_game_state.platforms[16].uncollide_with_entity();
@@ -340,7 +341,7 @@ void LevelB::update(float delta_time)
             m_game_state.bullets[i].set_render_bullet(false);
             m_game_state.bullets[i].uncollide_with_map();
             m_game_state.bullets[i].uncollide_with_entity();
-            std::cout << "Bullet " << i << " set to false & collided with map " << std::endl;
+//            std::cout << "Bullet " << i << " set to false & collided with map " << std::endl;
         }
         // If not map, then collided w/ platform & it is a rock bullet
         else if (m_game_state.bullets[i].get_collided_with() != nullptr && m_game_state.bullets[i].get_bullet_filepath_string() == ROCK_BULLET_FILEPATH && m_game_state.bullets[i].get_collided_with() != &m_game_state.platforms[16]) { // If not map, then collided w/ bear trap platform & it is a rock bullet & the platform is not the door
@@ -349,8 +350,15 @@ void LevelB::update(float delta_time)
             m_game_state.bullets[i].set_position(glm::vec3(-50.0f, -50.0f, 0.0f));
             m_game_state.bullets[i].uncollide_with_map();
             m_game_state.bullets[i].uncollide_with_entity();
+            for (int j = 6; j < 16; j++) {
+                if (m_game_state.platforms[j].check_collision(&m_game_state.bullets[i])) {
+//                    std::cout << i << " Platform render is false" << std::endl;
+                    m_game_state.platforms[j].set_render(false);
+                    m_game_state.platforms[j].set_position(glm::vec3(-50.0f, -50.0f, 0.0f));
+                }
+            }
             
-            std::cout << "Rock bullet collided with bear trap platform, deleted bullet & beartrap platform" << std::endl;
+//            std::cout << "Rock bullet collided with bear trap platform, deleted bullet & beartrap platform" << std::endl;
         }
         // It collided with *something*
         else if (m_game_state.bullets[i].get_collided_with() != nullptr) {
@@ -365,7 +373,7 @@ void LevelB::update(float delta_time)
         m_game_state.platforms[i].update(delta_time, m_game_state.player, m_game_state.bullets, m_game_state.player->get_bullet_cap(), m_game_state.map);
         if (m_game_state.player->check_collision(&m_game_state.platforms[i])) {
             m_game_state.player->set_curr_health(m_game_state.player->get_curr_health() - damage_factor);
-            std::cout << "Bear trap " << i << " collision detected, health at: " << m_game_state.player->get_curr_health() << std::endl;
+//            std::cout << "Bear trap " << i << " collision detected, health at: " << m_game_state.player->get_curr_health() << std::endl;
         }
     }
     
@@ -422,8 +430,11 @@ void LevelB::render(ShaderProgram *g_shader_program)
         if (m_game_state.platforms[i].get_render()) {
             m_game_state.platforms[i].render(g_shader_program);
         } else if (i == 16 && !m_game_state.platforms[i].get_render()) {
-            std::cout << "Moving platform " << i << " to new location" << std::endl;
+//            std::cout << "Moving platform " << i << " to new location" << std::endl;
             m_game_state.platforms[16].set_position(glm::vec3(-50.0f, -50.0f, 0.0f)); // Move platform off the map
+        } else if (i >= 6 && i <= 15 && !m_game_state.platforms[i].get_render()) {
+//            std::cout << "Moving " << i << " platform off the map " << std::endl;
+            m_game_state.platforms[i].set_position(glm::vec3(-50.0f, -50.0f, 0.0f)); // Move platform off the map
         }
     }
     
